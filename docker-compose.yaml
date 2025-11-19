@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: ./flask-server
+      dockerfile: ../Dockerfile.backend
+    container_name: flask-backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./flask-server:/app
+    environment:
+      - FLASK_ENV=development
+      - SECRET_KEY=supersecret12345_flask_server
+      - MONGO_URI=mongodb+srv://lijazsalim_db_user:liju2001@cluster0.u8pio4j.mongodb.net/?appName=Cluster0
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../Dockerfile.frontend
+    container_name: vite-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    environment:
+      - CHOKIDAR_USEPOLLING=true   # enables file watch polling on Windows
+    command: sh -c "npm run dev -- --host"
+

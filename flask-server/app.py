@@ -2,7 +2,6 @@ import datetime
 import email
 from flask import Flask, redirect, request, jsonify, session
 from flask_cors import CORS
-from google_auth_oauthlib.flow import Flow
 import os
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -12,10 +11,10 @@ from flask_bcrypt import Bcrypt
 
 load_dotenv()
 
-MONGO_URI = os.getenv("MONGO_URI")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://lijazsalim_db_user:liju2001@cluster0.u8pio4j.mongodb.net/?appName=Cluster0")
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")
+app.secret_key = os.getenv("SECRET_KEY", "supersecret12345_flask_server")
 CORS(app, supports_credentials=True)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -59,6 +58,8 @@ def Login():
              # Create JWT token
             token = create_access_token(identity=user_data['email'], expires_delta=datetime.timedelta(hours=2))
             return jsonify({"message": "Login successful!", "name": found['name'], "token": token}), 200
+        else:
+            return jsonify({"message": "Invalid email or password"}), 400   
     else:
         return jsonify({"message": "Invalid email or password"}), 400
     
@@ -81,4 +82,4 @@ def verify():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=5000, host='0.0.0.0', debug=True)
